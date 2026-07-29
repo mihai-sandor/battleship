@@ -1,15 +1,27 @@
 function createBoard(boardElement) {
-    for (let row = 0; row < 10; row++) {
-        const rowLetter = String.fromCharCode(65 + row);
-       
-        for (let col = 1; col <= 10; col++) {
+    for (let row = 0; row <= 10; row++) {
+        for (let col = 0; col <= 10; col++) {
             const cell = document.createElement('div');
-            cell.classList.add('cell');
-            cell.dataset.row = rowLetter;
-            cell.dataset.col = col;
+
+            if (row === 0 && col === 0) {
+                // colțul gol
+                cell.classList.add('corner');
+            } else if (row === 0) {
+                // rândul de sus: cifrele coloanelor
+                cell.classList.add('label');
+                cell.textContent = col;
+            } else if (col === 0) {
+                // coloana din stânga: literele rândurilor
+                cell.classList.add('label');
+                cell.textContent = String.fromCharCode(65 + row - 1);
+            } else {
+                // căsuță reală de joc
+                cell.classList.add('cell');
+                cell.dataset.row = String.fromCharCode(65 + row - 1);
+                cell.dataset.col = col;
+            }
 
             boardElement.appendChild(cell);
-         
         }
     }
 }

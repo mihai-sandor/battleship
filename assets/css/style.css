@@ -9,7 +9,7 @@ body {
     gap: 16px;
     font-family: Arial, sans-serif;
     background: #dceeff;
-    color: #314767;
+    color: #1f2937;
 }
 
 h1 {
@@ -58,9 +58,18 @@ button {
 
 .board {
     display: grid;
-    grid-template-columns: repeat(10, 32px);
-    grid-template-rows: repeat(10, 32px);
+    grid-template-columns: 24px repeat(10, 32px);
+    grid-template-rows: 24px repeat(10, 32px);
     gap: 2px;
+}
+
+.label,
+.corner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 600;
 }
 
 .cell {
