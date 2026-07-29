@@ -1,3 +1,97 @@
-* {
-    background-color: aqua;
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 24px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    font-family: Arial, sans-serif;
+    background: #dceeff;
+    color: #314767;
+}
+
+h1 {
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+li {
+    list-style: none;
+    margin: 4px;
+}
+
+button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 5px;
+    background: #2563eb;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+#status {
+    min-height: 1.5rem;
+    font-weight: 600;
+}
+
+.boards {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.board-container h2 {
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(10, 32px);
+    grid-template-rows: repeat(10, 32px);
+    gap: 2px;
+}
+
+.cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #94a3b8;
+    cursor: pointer;
+}
+
+.cell.water {
+    background: #2888d2;
+}
+
+.cell.ship {
+    background: #50482e;
+}
+
+.cell.close {
+    background: #ccd261;
+}
+
+.cell.hit {
+    background: #ef4444;
+}
+
+.cell.missed {
+    background: #bfdbfe;
+}
+
+.cell.sunken {
+    background: #7f1d1d;
 }
