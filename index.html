@@ -8,6 +8,28 @@
     </head>
     <body>
         <h1>Battleship</h1>
+
+        <ul>
+            <li><button data-mode="pvp">PvP</button></li>
+            <li><button data-mode="easy">PvCO (easy)</button></li>
+            <li><button data-mode="hard">PvCO (hard)</button></li>
+        </ul>
+
+        <p>Status</p>
+
+        <div class="boards">
+            <div class="board-container">
+                <h2>Harta ta</h2>
+                <div id="myBoard" class="board"></div>
+            </div>
+            <div class="board-container">
+                <h2>Harta adversarului</h2>
+                 <div id="enemyBoard" class="board"></div>
+            </div>
+        </div>
+
+        <button id="restart">Restart</button>
+
         <script src="assets/javascript/script.js"></script>  
     </body>
 </html>
