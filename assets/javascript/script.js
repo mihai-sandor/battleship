@@ -4,18 +4,14 @@ function createBoard(boardElement) {
             const cell = document.createElement('div');
 
             if (row === 0 && col === 0) {
-                // colțul gol
                 cell.classList.add('corner');
             } else if (row === 0) {
-                // rândul de sus: cifrele coloanelor
                 cell.classList.add('label');
                 cell.textContent = col;
             } else if (col === 0) {
-                // coloana din stânga: literele rândurilor
                 cell.classList.add('label');
                 cell.textContent = String.fromCharCode(65 + row - 1);
             } else {
-                // căsuță reală de joc
                 cell.classList.add('cell');
                 cell.dataset.row = String.fromCharCode(65 + row - 1);
                 cell.dataset.col = col;
