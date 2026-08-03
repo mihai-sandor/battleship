@@ -136,22 +136,85 @@ function markCloseCells(map, row, col, length, orientation) {
         }
     }
 }
-// Test setup: navă de lungime 2, orizontală, pornind de la B3 (row=1, col=2)
-myMap[1][2] = "ship";
-myMap[1][3] = "ship";
 
-markCloseCells(myMap, 1, 2, 2, 'horizontal');
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
 
-console.log("Ship case (need to be ship):", myMap[1][2]);
+function placeShipsRandomly(map, ships) {
+    const sortedShips = ships.slice().sort(function(a, b) {
+        return b.length - a.length;
+    });
+    for (let i = 0; i < sortedShips.length; i++) {
+        const ship = sortedShips[i];
+        let placed = false;
 
+        while (!placed) {
+            const orientation = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+            const row = getRandomInt(10);
+            const col = getRandomInt(10);
 
-console.log("Neighbor above the ship (need to be close):", myMap[0][2]);
+            if (isValidPosition(row, col, ship.length, orientation) &&
+                hasNoAdjacentShip(map, row, col, ship.length, orientation)) {
 
+                const cells = getShipCells(row, col, ship.length, orientation);
 
-console.log("Neighbor diagonally below-left (need to be close):", myMap[2][1]);
+                for (let j = 0; j < cells.length; j++) {
+                    map[cells[j].row][cells[j].col] = 'ship';
+                }
 
+                ship.positions = cells;
+                markCloseCells(map, row, col, ship.length, orientation);
+                placed = true;
+            }
+        }
+    }
+}
 
-console.log("Neighbor diagonally above-right, next to the second cell of the ship (need to be close):", myMap[0][4]);
+// Reset map to 'water' before placing ships
+const testMap = createEmptyMap();
+const testShips = createShips();
 
+placeShipsRandomly(testMap, testShips);
 
-console.log("Distant cell from the ship (need to remain water):", myMap[5][5]);
+// Test 1: total number of ship cells should equal the sum of lengths of all ships 1+2+3+4 = 10
+let shipCellCount = 0;
+for (let row = 0; row < 10; row++) {
+    for (let col = 0; col < 10; col++) {
+        if (testMap[row][col] === 'ship') {
+            shipCellCount++;
+        }
+    }
+}
+console.log("Test 1 - total ship cells (expected 10):", shipCellCount);
+
+// Test 2: each ship has exactly as many positions as its length
+for (let i = 0; i < testShips.length; i++) {
+    const ship = testShips[i];
+    console.log(
+        "Test 2 -", ship.name,
+        "| expected length:", ship.length,
+        "| actual positions:", ship.positions.length,
+        "| correct:", ship.positions.length === ship.length
+    );
+}
+
+// Test 3: each position stored in ship.positions is indeed a "ship" cell on the map
+let allPositionsMatch = true;
+for (let i = 0; i < testShips.length; i++) {
+    const ship = testShips[i];
+    for (let j = 0; j < ship.positions.length; j++) {
+        const pos = ship.positions[j];
+        if (testMap[pos.row][pos.col] !== 'ship') {
+            allPositionsMatch = false;
+        }
+    }
+}
+console.log("Test 3 - all positions in ship.positions are 'ship' cells on the map:", allPositionsMatch);
+
+for (let attempt = 0; attempt < 20; attempt++) {
+    const t = createEmptyMap();
+    const s = createShips();
+    placeShipsRandomly(t, s);
+    console.log("Attempt", attempt, "- OK, no errors or blockages");
+}
