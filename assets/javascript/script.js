@@ -114,15 +114,44 @@ function hasNoAdjacentShip(map, row, col, length, orientation) {
     return true;
 }
 
-myMap[2][5] = "ship";
-console.log("Test 1 (in limits):", isValidPosition(0, 0, 3, 'horizontal'));
+function markCloseCells(map, row, col, length, orientation) {
+    const shipCells = getShipCells(row, col, length, orientation);
 
-console.log("Test 2 (out of map):", isValidPosition(0, 8, 3, 'horizontal'));
+    for (let i = 0; i < shipCells.length; i++) {
+        const cell = shipCells[i];
 
-console.log("Test 3 (no neighbors, far away from existing ship):", hasNoAdjacentShip(myMap, 8, 8, 2, 'horizontal'));
+        for (let dRow = -1; dRow <= 1; dRow++) {
+            for (let dCol = -1; dCol <= 1; dCol++) {
+                const checkRow = cell.row + dRow;
+                const checkCol = cell.col + dCol;
 
-console.log("Test 4 (right on top of existing ship):", hasNoAdjacentShip(myMap, 2, 5, 1, 'horizontal'));
+                if (checkRow < 0 || checkRow > 9 || checkCol < 0 || checkCol > 9) {
+                    continue;
+                }
 
-console.log("Test 5 (touching existing ship):", hasNoAdjacentShip(myMap, 2, 6, 1, 'horizontal'));
+                if (map[checkRow][checkCol] === 'water') {
+                    map[checkRow][checkCol] = 'close';
+                }
+            }
+        }
+    }
+}
+// Test setup: navă de lungime 2, orizontală, pornind de la B3 (row=1, col=2)
+myMap[1][2] = "ship";
+myMap[1][3] = "ship";
 
-console.log("Test 6 (2 cells away):", hasNoAdjacentShip(myMap, 2, 7, 1, 'horizontal'));
+markCloseCells(myMap, 1, 2, 2, 'horizontal');
+
+console.log("Ship case (need to be ship):", myMap[1][2]);
+
+
+console.log("Neighbor above the ship (need to be close):", myMap[0][2]);
+
+
+console.log("Neighbor diagonally below-left (need to be close):", myMap[2][1]);
+
+
+console.log("Neighbor diagonally above-right, next to the second cell of the ship (need to be close):", myMap[0][4]);
+
+
+console.log("Distant cell from the ship (need to remain water):", myMap[5][5]);
