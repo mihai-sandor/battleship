@@ -70,6 +70,41 @@ function isValidPosition(row, col, length, orientation) {
         return endRow <= 9;
     }
 }
-destroyer = isValidPosition(9, 6, 2, 'vertical');
-battleship = isValidPosition(row, 6, 4, 'horizontal');
+
+function getShipCells(row, col, length, orientation) {
+    const cells = [];
+    for (let i = 0; i < length; i++) {
+        if (orientation === 'horizontal') {
+            cells.push({ row: row, col: col + i });
+        } else {
+            cells.push({ row: row + i, col: col });
+        }
+    }
+    return cells;
+}
+
+function hasNoAdjacentShip(map, row, col, length, orientation) {
+    const shipCells = getShipCells(row, col, length, orientation);
+
+    for (let i = 0; i < shipCells.length; i++) {
+        const cell = shipCells[i];
+
+        for (let dRow = -1; dRow <= 1; dRow++) {
+            for (let dCol = -1; dCol <= 1; dCol++) {
+                const checkRow = cell.row + dRow;
+                const checkCol = cell.col + dCol;
+
+                if (checkRow < 0 || checkRow > 9 || checkCol < 0 || checkCol > 9) {
+                    continue; // outside the map, nothing to check
+                }
+
+                if (map[checkRow][checkCol] === 'ship') {
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
+}
 
