@@ -1,3 +1,4 @@
+// Create an empty map (10x10 grid filled with 'water')
 function createEmptyMap() {   // 1. Arrays (source of truth)
     const map = [];
     for (let row = 0; row < 10; row++) {
@@ -9,10 +10,12 @@ function createEmptyMap() {   // 1. Arrays (source of truth)
 const myMap = createEmptyMap();
 const enemyMap = createEmptyMap();
 
+// Convert letter to index (A=0, B=1, ..., J=9)
 function letterToIndex(letter) {   // 2. Letter -> index conversion function
     return letter.toUpperCase().charCodeAt(0) - 65;
 }
 
+// Create the board with labels and cells
 function createBoard(boardElement) {
     for (let row = 0; row <= 10; row++) {
         for (let col = 0; col <= 10; col++) {
@@ -49,6 +52,7 @@ const col = 6 - 1;               // 5
 
 myMap[row][col] = "ship";
 
+// Create ships with their names, lengths, and positions
 function createShips() {
     return [
         { name: 'Submarine', length: 1, positions: [] },
@@ -61,6 +65,7 @@ function createShips() {
 const myShips = createShips();
 const enemyShips = createShips();
 
+// function to check if a ship can be placed at the given position without going out of bounds
 function isValidPosition(row, col, length, orientation) {
     if (orientation === 'horizontal') {
         const endCol = col + length - 1;
@@ -71,6 +76,7 @@ function isValidPosition(row, col, length, orientation) {
     }
 }
 
+// function to get the cells occupied by a ship based on its starting position, length, and orientation
 function getShipCells(row, col, length, orientation) {
     const cells = [];
     for (let i = 0; i < length; i++) {
@@ -82,7 +88,7 @@ function getShipCells(row, col, length, orientation) {
     }
     return cells;
 }
-
+// function to check if there are no adjacent ships around the proposed ship placement
 function hasNoAdjacentShip(map, row, col, length, orientation) {
     const shipCells = getShipCells(row, col, length, orientation);
 
@@ -108,3 +114,15 @@ function hasNoAdjacentShip(map, row, col, length, orientation) {
     return true;
 }
 
+myMap[2][5] = "ship";
+console.log("Test 1 (in limits):", isValidPosition(0, 0, 3, 'horizontal'));
+
+console.log("Test 2 (out of map):", isValidPosition(0, 8, 3, 'horizontal'));
+
+console.log("Test 3 (no neighbors, far away from existing ship):", hasNoAdjacentShip(myMap, 8, 8, 2, 'horizontal'));
+
+console.log("Test 4 (right on top of existing ship):", hasNoAdjacentShip(myMap, 2, 5, 1, 'horizontal'));
+
+console.log("Test 5 (touching existing ship):", hasNoAdjacentShip(myMap, 2, 6, 1, 'horizontal'));
+
+console.log("Test 6 (2 cells away):", hasNoAdjacentShip(myMap, 2, 7, 1, 'horizontal'));
