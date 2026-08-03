@@ -1,7 +1,7 @@
 function createEmptyMap() {   // 1. Arrays (source of truth)
     const map = [];
     for (let row = 0; row < 10; row++) {
-        map.push(new Array(10).fill('apa'));
+        map.push(new Array(10).fill('water'));
     }
     return map;
 }
@@ -47,4 +47,16 @@ console.log(document.querySelectorAll('#enemyBoard .cell').length);
 const row = letterToIndex("C");  // 2
 const col = 6 - 1;               // 5
 
-myMap[row][col] = "nava";
+myMap[row][col] = "ship";
+
+function createShips() {
+    return [
+        { name: 'Submarine', length: 1, positions: [] },
+        { name: 'Destroyer', length: 2, positions: [] },
+        { name: 'Cruiser', length: 3, positions: [] },
+        { name: 'Battleship', length: 4, positions: [] }
+    ];
+}
+
+const myShips = createShips();
+const enemyShips = createShips();
