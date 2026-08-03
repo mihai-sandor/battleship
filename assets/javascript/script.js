@@ -60,3 +60,16 @@ function createShips() {
 
 const myShips = createShips();
 const enemyShips = createShips();
+
+function isValidPosition(row, col, length, orientation) {
+    if (orientation === 'horizontal') {
+        const endCol = col + length - 1;
+        return endCol <= 9;
+    } else {
+        const endRow = row + length - 1;
+        return endRow <= 9;
+    }
+}
+destroyer = isValidPosition(9, 6, 2, 'vertical');
+battleship = isValidPosition(row, 6, 4, 'horizontal');
+
