@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang = "ro">
+<html lang="ro">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,7 +15,9 @@
             <li><button data-mode="hard">PvCO (hard)</button></li>
         </ul>
 
-        <p>Status</p>
+        <p id="status">Status</p>
+
+        <button id="rotateBtn">Rotește nava</button>
 
         <div class="boards">
             <div class="board-container">
@@ -24,12 +26,12 @@
             </div>
             <div class="board-container">
                 <h2>Harta adversarului</h2>
-                 <div id="enemyBoard" class="board"></div>
+                <div id="enemyBoard" class="board"></div>
             </div>
         </div>
 
         <button id="restart">Restart</button>
 
-        <script src="assets/javascript/script.js"></script>  
+        <script src="assets/javascript/script.js"></script>
     </body>
 </html>

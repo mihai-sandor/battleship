@@ -40,17 +40,16 @@ function createBoard(boardElement) {
     }
 }
 
-createBoard(document.getElementById('myBoard'));
-createBoard(document.getElementById('enemyBoard'));
+const myBoardElement = document.getElementById('myBoard');
+const enemyBoardElement = document.getElementById('enemyBoard');
+const status = document.getElementById('status');
+
+createBoard(myBoardElement);
+createBoard(enemyBoardElement);
 
 // Console log just to count the numbers of elements created on each board
 console.log(document.querySelectorAll('#myBoard .cell').length);
 console.log(document.querySelectorAll('#enemyBoard .cell').length);
-
-const row = letterToIndex("C");  // 2
-const col = 6 - 1;               // 5
-
-myMap[row][col] = "ship";
 
 // Create ships with their names, lengths, and positions
 function createShips() {
@@ -88,6 +87,7 @@ function getShipCells(row, col, length, orientation) {
     }
     return cells;
 }
+
 // function to check if there are no adjacent ships around the proposed ship placement
 function hasNoAdjacentShip(map, row, col, length, orientation) {
     const shipCells = getShipCells(row, col, length, orientation);
@@ -114,6 +114,7 @@ function hasNoAdjacentShip(map, row, col, length, orientation) {
     return true;
 }
 
+// function to mark the cells around a placed ship as 'close', without overwriting the ship itself
 function markCloseCells(map, row, col, length, orientation) {
     const shipCells = getShipCells(row, col, length, orientation);
 
@@ -141,10 +142,12 @@ function getRandomInt(max) {
     return Math.floor(Math.random() * max);
 }
 
+// function to place all ships randomly on the map, largest first
 function placeShipsRandomly(map, ships) {
     const sortedShips = ships.slice().sort(function(a, b) {
         return b.length - a.length;
     });
+
     for (let i = 0; i < sortedShips.length; i++) {
         const ship = sortedShips[i];
         let placed = false;
@@ -171,50 +174,73 @@ function placeShipsRandomly(map, ships) {
     }
 }
 
-// Reset map to 'water' before placing ships
-const testMap = createEmptyMap();
-const testShips = createShips();
+// function to draw the current state of a map onto its board element
+function renderBoard(map, boardElement) {
+    const cells = boardElement.querySelectorAll('.cell');
+    cells.forEach(function(cell) {
+        const row = letterToIndex(cell.dataset.row);
+        const col = Number(cell.dataset.col) - 1;
+        const state = map[row][col];
 
-placeShipsRandomly(testMap, testShips);
+        cell.classList.remove('water', 'ship', 'close', 'hit', 'missed', 'sunken');
+        cell.classList.add(state);
+    });
+}
 
-// Test 1: total number of ship cells should equal the sum of lengths of all ships 1+2+3+4 = 10
-let shipCellCount = 0;
-for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 10; col++) {
-        if (testMap[row][col] === 'ship') {
-            shipCellCount++;
-        }
+// --- Manual ship placement for the human player ---
+
+// Same ships, same objects, just placed largest-first (4 -> 1)
+const placementOrder = myShips.slice().sort(function(a, b) {
+    return b.length - a.length;
+});
+
+let currentShipIndex = 0;
+let currentOrientation = 'horizontal';
+
+function placeNextShip(row, col) {
+    if (currentShipIndex >= placementOrder.length) {
+        return;
+    }
+
+    const ship = placementOrder[currentShipIndex];
+
+    if (!isValidPosition(row, col, ship.length, currentOrientation) ||
+        !hasNoAdjacentShip(myMap, row, col, ship.length, currentOrientation)) {
+        status.textContent = 'Poziție invalidă, încearcă altă căsuță.';
+        return;
+    }
+
+    const cells = getShipCells(row, col, ship.length, currentOrientation);
+    for (let i = 0; i < cells.length; i++) {
+        myMap[cells[i].row][cells[i].col] = 'ship';
+    }
+    ship.positions = cells;
+    markCloseCells(myMap, row, col, ship.length, currentOrientation);
+
+    renderBoard(myMap, myBoardElement);
+    currentShipIndex++;
+
+    if (currentShipIndex >= placementOrder.length) {
+        status.textContent = 'Toate navele au fost plasate!';
+    } else {
+        status.textContent = 'Plasează nava: ' + placementOrder[currentShipIndex].name;
     }
 }
-console.log("Test 1 - total ship cells (expected 10):", shipCellCount);
 
-// Test 2: each ship has exactly as many positions as its length
-for (let i = 0; i < testShips.length; i++) {
-    const ship = testShips[i];
-    console.log(
-        "Test 2 -", ship.name,
-        "| expected length:", ship.length,
-        "| actual positions:", ship.positions.length,
-        "| correct:", ship.positions.length === ship.length
-    );
-}
+myBoardElement.querySelectorAll('.cell').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+        const row = letterToIndex(cell.dataset.row);
+        const col = Number(cell.dataset.col) - 1;
+        placeNextShip(row, col);
+    });
+});
 
-// Test 3: each position stored in ship.positions is indeed a "ship" cell on the map
-let allPositionsMatch = true;
-for (let i = 0; i < testShips.length; i++) {
-    const ship = testShips[i];
-    for (let j = 0; j < ship.positions.length; j++) {
-        const pos = ship.positions[j];
-        if (testMap[pos.row][pos.col] !== 'ship') {
-            allPositionsMatch = false;
-        }
-    }
-}
-console.log("Test 3 - all positions in ship.positions are 'ship' cells on the map:", allPositionsMatch);
+document.getElementById('rotateBtn').addEventListener('click', function() {
+    currentOrientation = currentOrientation === 'horizontal' ? 'vertical' : 'horizontal';
+    status.textContent = 'Orientare: ' + currentOrientation;
+});
 
-for (let attempt = 0; attempt < 20; attempt++) {
-    const t = createEmptyMap();
-    const s = createShips();
-    placeShipsRandomly(t, s);
-    console.log("Attempt", attempt, "- OK, no errors or blockages");
-}
+// Draw the initial (all-water) state, and show which ship to place first
+renderBoard(myMap, myBoardElement);
+renderBoard(enemyMap, enemyBoardElement);
+status.textContent = 'Plasează nava: ' + placementOrder[currentShipIndex].name;
