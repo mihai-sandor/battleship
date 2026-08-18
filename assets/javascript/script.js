@@ -186,6 +186,37 @@ function renderBoard(map, boardElement) {
         cell.classList.add(state);
     });
 }
+// Function to process a shot on the map, updating the state and returning the result
+function processShot(map, row, col) {
+    const cellState = map[row][col];
+
+    if(cellState ==='hit' || cellState ==='missed' || cellState ==='sunken') {
+        return null; // Already shot here, do nothing
+    }
+
+    if (cellState === 'ship') {
+        map[row][col] = 'hit';
+        return 'hit';
+    } else {
+        map[row][col] = 'missed';
+        return 'missed';
+    }
+}
+
+enemyBoardElement.querySelectorAll('.cell').forEach(function(cell) {
+    cell.addEventListener('click', function() {
+        const row = letterToIndex(cell.dataset.row);
+        const col = Number(cell.dataset.col) -1;
+
+        const result = processShot(enemyMap, row, col);
+        if (result === 'hit') {
+            return;
+        }
+        renderBoard(enemyMap, enemyBoardElement);
+
+        status.textContent = result ==='hit' ? 'Lovit!' : 'Ratat!';
+    });
+});
 
 // --- Manual ship placement for the human player ---
 
@@ -244,3 +275,14 @@ document.getElementById('rotateBtn').addEventListener('click', function() {
 renderBoard(myMap, myBoardElement);
 renderBoard(enemyMap, enemyBoardElement);
 status.textContent = 'Plasează nava: ' + placementOrder[currentShipIndex].name;
+
+//Test setup: Manual ship placement for testing on B2(row=1, col=1)
+enemyMap[1][1] = "ship";
+// expect: "hit"
+console.log("Test 1 (hit on ship):", processShot(enemyMap, 1, 1));
+// expect: "missed"
+console.log("Test 2 (hit on water):", processShot(enemyMap, 5, 5));
+// expect: null (already shot here)
+console.log("Test 3 (shoot twice in the same place):", processShot(enemyMap, 1, 1));
+// expect: "hit", "missed"
+console.log("Initial state of map after test:", enemyMap[1][1], enemyMap[5][5]);
