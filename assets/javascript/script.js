@@ -209,8 +209,22 @@ function processShot(map, row, col) {
     }
 }
 
+function allShipsSunk(ships, map) {
+    for (let i = 0; i < ships.length; i++) {
+        if (!isShipSunk(ships[i], map)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+let gameOver = false;
+
 enemyBoardElement.querySelectorAll('.cell').forEach(function(cell) {
     cell.addEventListener('click', function() {
+        if (gameOver) {
+            return;
+        }
         const row = letterToIndex(cell.dataset.row);
         const col = Number(cell.dataset.col) -1;
 
@@ -221,14 +235,20 @@ enemyBoardElement.querySelectorAll('.cell').forEach(function(cell) {
         }
 
         if (result === 'hit') {
-            const ship =  findShipAt(row, col, enemyShips);
+            const ship = findShipAt(row, col, enemyShips);
 
             if (ship && isShipSunk(ship, enemyMap)) {
                 for (let i = 0; i < ship.positions.length; i++) {
                     const pos = ship.positions[i];
                     enemyMap[pos.row][pos.col] = 'sunken';
                 }
-                status.textContent = ship.name + ' a fost scufundat!';
+
+                if (allShipsSunk(enemyShips, enemyMap)) {
+                    status.textContent = 'Ai câștigat! Toate navele adversarului au fost distruse!';
+                    gameOver = true;
+                } else {
+                    status.textContent = ship.name + ' a fost scufundat!';
+                }
             } else {
                 status.textContent = 'Lovit!';
             }
@@ -237,7 +257,6 @@ enemyBoardElement.querySelectorAll('.cell').forEach(function(cell) {
         }
 
         renderBoard(enemyMap, enemyBoardElement, true);
-
     });
 });
 
@@ -302,7 +321,8 @@ status.textContent = 'Plasează nava: ' + placementOrder[currentShipIndex].name;
 function isShipSunk(ship, map) {
     for (let i = 0; i < ship.positions.length; i++) {
         const pos = ship.positions[i];
-        if (map[pos.row][pos.col]  !== "hit") {
+        const state = map[pos.row][pos.col];
+        if (state !== "hit" && state !== "sunken") {
             return false;
         }
     }
