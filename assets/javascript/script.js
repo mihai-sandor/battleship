@@ -175,12 +175,18 @@ function placeShipsRandomly(map, ships) {
 }
 
 // function to draw the current state of a map onto its board element
-function renderBoard(map, boardElement) {
+// hideShips = true hides 'ship' and 'close' cells (shows them as 'water' instead) -
+// used for the enemy board, so undiscovered ships stay hidden
+function renderBoard(map, boardElement, hideShips) {
     const cells = boardElement.querySelectorAll('.cell');
     cells.forEach(function(cell) {
         const row = letterToIndex(cell.dataset.row);
         const col = Number(cell.dataset.col) - 1;
-        const state = map[row][col];
+        let state = map[row][col];
+
+        if (hideShips && (state === 'ship' || state === 'close')) {
+            state = 'water';
+        }
 
         cell.classList.remove('water', 'ship', 'close', 'hit', 'missed', 'sunken');
         cell.classList.add(state);
@@ -209,12 +215,29 @@ enemyBoardElement.querySelectorAll('.cell').forEach(function(cell) {
         const col = Number(cell.dataset.col) -1;
 
         const result = processShot(enemyMap, row, col);
+
         if (result === null) {
             return;
         }
-        renderBoard(enemyMap, enemyBoardElement);
 
-        status.textContent = result ==='hit' ? 'Lovit!' : 'Ratat!';
+        if (result === 'hit') {
+            const ship =  findShipAt(row, col, enemyShips);
+
+            if (ship && isShipSunk(ship, enemyMap)) {
+                for (let i = 0; i < ship.positions.length; i++) {
+                    const pos = ship.positions[i];
+                    enemyMap[pos.row][pos.col] = 'sunken';
+                }
+                status.textContent = ship.name + ' a fost scufundat!';
+            } else {
+                status.textContent = 'Lovit!';
+            }
+        } else {
+            status.textContent = 'Ratat!';
+        }
+
+        renderBoard(enemyMap, enemyBoardElement, true);
+
     });
 });
 
@@ -273,7 +296,7 @@ document.getElementById('rotateBtn').addEventListener('click', function() {
 
 // Draw the initial (all-water) state, and show which ship to place first
 renderBoard(myMap, myBoardElement);
-renderBoard(enemyMap, enemyBoardElement);
+renderBoard(enemyMap, enemyBoardElement, true);
 status.textContent = 'Plasează nava: ' + placementOrder[currentShipIndex].name;
 
 function isShipSunk(ship, map) {
@@ -299,26 +322,3 @@ function findShipAt(row, col, ships) {
     return null;
 }
 
-// Test setup: manual ship, length 2 on  D5-D6 (row=3, col=4 and col=5)
-const testShip = { name: 'TestShip', length: 2, positions: [{row: 3, col: 4}, {row: 3, col: 5}] };
-const testShips = [testShip];
-
-enemyMap[3][4] = 'ship';
-enemyMap[3][5] = 'ship';
-
-// expect: object testShip (not null)
-console.log("Test 1 (find ship at correct position):", findShipAt(3, 4, testShips));
-// expect: null
-console.log("Test 2 (position without ship):", findShipAt(7, 7, testShips));
-// expect: false
-console.log("Test 3 (ship NOT sunk, no cells hit yet):", isShipSunk(testShip, enemyMap));
-
-// Simulate one hit on the first cell of the ship
-enemyMap[3][4] = 'hit';
-// expect: false
-console.log("Test 4 (ship NOT sunk, only 1 of 2 cells hit):", isShipSunk(testShip, enemyMap));
-
-// Simulate hit on the second cell of the ship
-enemyMap[3][5] = 'hit';
-// expect: true
-console.log("Test 5 (ship SUNK, both cells hit):", isShipSunk(testShip, enemyMap));
