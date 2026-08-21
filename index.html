@@ -21,16 +21,22 @@
 
         <div class="boards">
             <div class="board-container">
-                <h2>Harta ta</h2>
+                <h2 id="myBoardTitle">Harta ta</h2>
                 <div id="myBoard" class="board"></div>
             </div>
+
             <div class="board-container">
-                <h2>Harta adversarului</h2>
+                <h2 id="enemyBoardTitle">Harta adversarului</h2>
                 <div id="enemyBoard" class="board"></div>
             </div>
         </div>
 
         <button id="restart">Restart</button>
+
+        <div id="passScreen" class="hidden">
+            <p id="passMessage"></p>
+            <button id="continueBtn">Continuă</button>
+        </div>
 
         <script src="assets/javascript/script.js"></script>
     </body>
